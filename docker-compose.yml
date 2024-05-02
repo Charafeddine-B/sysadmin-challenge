@@ -5,16 +5,16 @@ services:
     build:
       context: .
       dockerfile: ./php/Dockerfile
-    volumes:
-      - ./drupal:/var/www/html
-    expose:
-      - 9000
+    ports:
+      - "9000:9000"
     user: "1000:1000"
+    networks:
+      - voidnetwork
 
   nginx:
     build:
       context: .
-      dockerfile: ./nginx/
+      dockerfile: ./nginx/Dockerfile
     ports:
       - "80:80"
     volumes:
@@ -24,16 +24,33 @@ services:
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd
     depends_on:
       - php
+    networks:
+      - voidnetwork
 
   mysql:
     image: mysql:8.3
     environment:
       MYSQL_ROOT_PASSWORD: drupal@@11
       MYSQL_DATABASE: drupal
+      MYSQL_LOG_ERROR: /var/log/mysql/error.log
+      MYSQL_GENERAL_LOG_FILE: /var/log/mysql/general.log
+      MYSQL_SLOW_QUERY_LOG_FILE: /var/log/mysql/slow.log
     ports:
       - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    ulimits:
+      nofile:
+        soft: 20000
+        hard: 40000
+    networks:
+      - voidnetwork
 
 volumes:
   mysql-data:
+    driver: local
+
+networks:
+  voidnetwork:
+    driver: bridge
