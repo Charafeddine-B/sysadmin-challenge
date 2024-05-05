@@ -67,11 +67,11 @@
         state: latest
         update_cache: true
 
-- name: Configure Docker log driver
-  lineinfile:
-    path: /etc/docker/daemon.json
-    line: '{"log-driver": "json-file", "log-opts": {"max-size": "100m"}}'
-    create: yes
+    - name: Configure Docker log driver
+      lineinfile:
+        path: /etc/docker/daemon.json
+        line: '{"log-driver": "json-file", "log-opts": {"max-size": "100m"}}'
+        create: yes
 
     - name: Set up Docker cron job for cleanup
       cron:

@@ -8,6 +8,9 @@ services:
     ports:
       - "9000:9000"
     user: "1000:1000"
+    volumes:
+      - sock:/sock
+      - ./drupal:/var/www/html
     networks:
       - voidnetwork
 
@@ -18,11 +21,13 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./drupal:/var/www/html
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/.htpasswd:/etc/nginx/.htpasswd
+      - sock:/sock
     depends_on:
+      - php
+    links:
       - php
     networks:
       - voidnetwork
@@ -50,6 +55,7 @@ services:
 volumes:
   mysql-data:
     driver: local
+  sock:
 
 networks:
   voidnetwork:
